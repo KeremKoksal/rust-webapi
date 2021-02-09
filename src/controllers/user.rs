@@ -1,4 +1,4 @@
-use crate::handlers::user::{Create, GetUsers};
+use crate::handlers::user::{Create, GetUsers,GetUser};
 use crate::models::{
   user::{NewUser, SearchUser, UpdateUser},
   AppState,
@@ -11,8 +11,13 @@ use uuid::Uuid;
 type DbPool = Pool<ConnectionManager<PgConnection>>;
 
 #[get("/{id}")]
-pub async fn get_user(pool: web::Data<DbPool>, web::Path(uid): web::Path<Uuid>) -> impl Responder {
-  HttpResponse::Ok()
+pub async fn get_user(state: web::Data<AppState>, web::Path(uid): web::Path<Uuid>) -> impl Responder {
+  let db = state.as_ref().db.clone();
+  match db.send(GetUser{uid:uid}).await{
+    Ok(Ok(user)) => HttpResponse::Ok().json(user),
+    _ => HttpResponse::InternalServerError().json("Something went wrong"),
+  }
+  
 }
 
 #[get("/")]

@@ -9,6 +9,8 @@ edition = "2018"
 [dependencies]
 actix="0.10.0"
 actix-web = "3"
+argon2 = "0.1"
+rand_core = { version = "0.6", features = ["std"] }
 serde="1"
 serde_json="1"
 uuid={ version= "0.8.2",features = ["v4","serde"]}
@@ -16,3 +18,4 @@ futures="0.3"
 diesel={version="1.4.5", features=["uuidv07", "r2d2", "postgres","chrono"] }
 chrono={version="0.4.19", features=["serde"]}
 dotenv="0.15.0"
+jsonwebtoken="7.2.0"

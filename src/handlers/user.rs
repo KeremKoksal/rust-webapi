@@ -1,8 +1,16 @@
+use uuid::Uuid;
 use super::DbActor;
 use crate::diesel::prelude::*;
 use crate::models::user::{NewUser, User};
 use crate::schema::users::dsl::*;
 use actix::{Handler, Message};
+use argon2::{
+  password_hash::{PasswordHash, PasswordHasher, PasswordVerifier, SaltString},
+  Argon2
+};
+use rand_core::OsRng;
+
+
 
 #[derive(Message)]
 #[rtype(result = "QueryResult<User>")]
@@ -25,12 +33,18 @@ impl Handler<Create> for DbActor {
 
   fn handle(&mut self, msg: Create, _: &mut Self::Context) -> Self::Result {
     let conn = self.0.get().expect("Unable to get a connection");
+    let salt = SaltString::generate(&mut OsRng);
+    let argon2 = Argon2::default();
+    let pw: &[u8] = msg.password.as_bytes();
+    let password_hash = argon2.hash_password_simple(pw, salt.as_ref()).unwrap().to_string();
+
+
     let new_user = NewUser {
       username: msg.username,
       staff_title: msg.staff_title,
       education_title: msg.education_title,
       email: msg.email,
-      password: msg.password,
+      password: password_hash,
       first_name: msg.first_name,
       last_name: msg.last_name,
       bio: msg.bio,
@@ -63,7 +77,7 @@ impl Handler<GetUsers> for DbActor {
   type Result = QueryResult<Vec<User>>;
 
   fn handle(&mut self, search_filters: GetUsers, _: &mut Self::Context) -> Self::Result {
-    let conn = self.0.get().expect("Unable to get a connectio");
+    let conn = self.0.get().expect("Unable to get a connection");
     let mut offset = 0;
     let mut limit = 10;
     if search_filters.take.is_some() {
@@ -99,5 +113,20 @@ impl Handler<GetUsers> for DbActor {
     }
 
     data.get_results::<User>(&conn)
+  }
+}
+
+#[derive(Message)]
+#[rtype(result = "QueryResult<User>")]
+pub struct GetUser{
+  pub uid: Uuid,
+}
+
+impl Handler<GetUser> for DbActor{
+  type Result = QueryResult<User>;
+
+  fn handle(&mut self, user: GetUser,_: &mut Self::Context)-> Self::Result {
+    let conn = self.0.get().expect("Unable to get a connection");
+    users.filter(id.eq(user.uid)).get_result::<User>(&conn)
   }
 }
