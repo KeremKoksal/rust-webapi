@@ -1,0 +1,86 @@
+use crate::schema::users;
+use actix_web::{Error, HttpRequest, HttpResponse, Responder};
+use chrono::NaiveDateTime;
+use diesel::{Insertable, Queryable};
+use futures::future::{ready, Ready};
+use serde::{Deserialize, Serialize};
+use uuid::Uuid;
+
+#[derive(Debug, Clone, Serialize, Queryable)]
+pub struct User {
+  pub id: Uuid,
+  pub username: String,
+  pub staff_title: Option<String>,
+  pub education_title: Option<String>,
+  pub email: String,
+  #[serde(skip_serializing)]
+  pub password: String,
+  pub first_name: Option<String>,
+  pub last_name: Option<String>,
+  pub bio: Option<String>,
+  pub image: Option<String>,
+  pub department_id: Option<i16>,
+  #[serde(skip_serializing)]
+  pub email_verified: bool,
+  #[serde(skip_serializing)]
+  pub active: bool,
+  pub roles: Vec<String>,
+  pub created_at: NaiveDateTime,
+  pub updated_at: NaiveDateTime,
+}
+
+impl Responder for User {
+  type Error = Error;
+  type Future = Ready<Result<HttpResponse, Error>>;
+
+  fn respond_to(self, _req: &HttpRequest) -> Self::Future {
+    let body = serde_json::to_string(&self).unwrap();
+
+    ready(Ok(
+      HttpResponse::Ok()
+        .content_type("application/json")
+        .body(body),
+    ))
+  }
+}
+#[derive(Deserialize)]
+pub struct SearchUser {
+  pub page: Option<i32>,
+  pub take: Option<i32>,
+  pub username: Option<String>,
+  pub first_name: Option<String>,
+  pub last_name: Option<String>,
+  pub email: Option<String>,
+  pub department_id: Option<i16>,
+  pub active: Option<bool>,
+  pub roles: Option<Vec<String>>,
+}
+
+#[derive(Deserialize, Debug, Insertable)]
+#[table_name = "users"]
+pub struct NewUser {
+  pub username: String,
+  pub staff_title: Option<String>,
+  pub education_title: Option<String>,
+  pub email: String,
+  pub password: String,
+  pub first_name: Option<String>,
+  pub last_name: Option<String>,
+  pub bio: String,
+  pub image: String,
+  pub department_id: Option<i16>,
+  pub roles: Vec<String>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct UpdateUser {
+  pub id: Uuid,
+  pub staff_title: Option<String>,
+  pub education_title: Option<String>,
+  pub first_name: Option<String>,
+  pub last_name: Option<String>,
+  pub bio: String,
+  pub image: String,
+  pub department_id: Option<i16>,
+  pub roles: Vec<String>,
+}

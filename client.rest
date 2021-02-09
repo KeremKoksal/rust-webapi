@@ -1,0 +1,60 @@
+GET http://localhost:8080
+# Host: www.rust-lang.org
+
+###
+GET http://localhost:8080/api/v1/users/ HTTP/1.1
+User-Agent: rest-client
+Content-Type: application/json
+
+{
+  "page":0,
+  "take":10,
+  "username": "",
+  "first_name": "",
+  "last_name": "",
+  "email": "",
+  "department_id": 0,
+  "active": true,
+  "roles": []
+
+}
+###
+GET http://localhost:8080/api/v1/users/750a7d29-9725-4064-bb12-357fe81c627d HTTP/1.1
+User-Agent: rest-client
+
+
+###
+
+POST http://localhost:8080/api/v1/users/ HTTP/1.1
+User-Agent: rest-client
+Content-Type: application/json
+
+{
+      "username": "user 1",
+      "staff_title": "staff",
+      "education_title": "Phd",
+      "email": "user1@example.com",
+      "password": "password",
+      "first_name": "user 1",
+      "last_name": "loser",
+      "bio": "some bio",
+      "image": "https://avatars.githubusercontent.com/u/6117104?s=60&v=4",
+      "roles": ["slave"]
+}
+
+###
+
+PUT http://localhost:8080/api/v1/users/ HTTP/1.1
+User-Agent: rest-client
+Content-Type: application/json
+
+{
+  "id":1,
+  "username":"updated name"
+}
+###
+
+DELETE  http://localhost:8080/api/v1/users/1 HTTP/1.1
+User-Agent: rest-client
+
+###
