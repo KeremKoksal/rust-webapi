@@ -79,8 +79,8 @@ pub struct UpdateUser {
   pub education_title: Option<String>,
   pub first_name: Option<String>,
   pub last_name: Option<String>,
-  pub bio: String,
-  pub image: String,
+  pub bio: Option<String>,
+  pub image: Option<String>,
   pub department_id: Option<i16>,
-  pub roles: Vec<String>,
+  pub roles: Option<Vec<String>>,
 }

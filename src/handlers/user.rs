@@ -1,4 +1,3 @@
-use uuid::Uuid;
 use super::DbActor;
 use crate::diesel::prelude::*;
 use crate::models::user::{NewUser, User};
@@ -6,11 +5,10 @@ use crate::schema::users::dsl::*;
 use actix::{Handler, Message};
 use argon2::{
   password_hash::{PasswordHash, PasswordHasher, PasswordVerifier, SaltString},
-  Argon2
+  Argon2,
 };
 use rand_core::OsRng;
-
-
+use uuid::Uuid;
 
 #[derive(Message)]
 #[rtype(result = "QueryResult<User>")]
@@ -36,8 +34,10 @@ impl Handler<Create> for DbActor {
     let salt = SaltString::generate(&mut OsRng);
     let argon2 = Argon2::default();
     let pw: &[u8] = msg.password.as_bytes();
-    let password_hash = argon2.hash_password_simple(pw, salt.as_ref()).unwrap().to_string();
-
+    let password_hash = argon2
+      .hash_password_simple(pw, salt.as_ref())
+      .unwrap()
+      .to_string();
 
     let new_user = NewUser {
       username: msg.username,
@@ -61,7 +61,7 @@ impl Handler<Create> for DbActor {
 
 #[derive(Message)]
 #[rtype(result = "QueryResult<Vec<User>>")]
-pub struct GetUsers {
+pub struct GetAll {
   pub page: Option<i32>,
   pub take: Option<i32>,
   pub username: Option<String>,
@@ -73,10 +73,10 @@ pub struct GetUsers {
   pub roles: Option<Vec<String>>,
 }
 
-impl Handler<GetUsers> for DbActor {
+impl Handler<GetAll> for DbActor {
   type Result = QueryResult<Vec<User>>;
 
-  fn handle(&mut self, search_filters: GetUsers, _: &mut Self::Context) -> Self::Result {
+  fn handle(&mut self, search_filters: GetAll, _: &mut Self::Context) -> Self::Result {
     let conn = self.0.get().expect("Unable to get a connection");
     let mut offset = 0;
     let mut limit = 10;
@@ -118,15 +118,66 @@ impl Handler<GetUsers> for DbActor {
 
 #[derive(Message)]
 #[rtype(result = "QueryResult<User>")]
-pub struct GetUser{
+pub struct GetById {
   pub uid: Uuid,
 }
 
-impl Handler<GetUser> for DbActor{
+impl Handler<GetById> for DbActor {
   type Result = QueryResult<User>;
 
-  fn handle(&mut self, user: GetUser,_: &mut Self::Context)-> Self::Result {
+  fn handle(&mut self, user: GetById, _: &mut Self::Context) -> Self::Result {
     let conn = self.0.get().expect("Unable to get a connection");
     users.filter(id.eq(user.uid)).get_result::<User>(&conn)
+  }
+}
+
+#[derive(Message)]
+#[rtype(result = "QueryResult<User>")]
+pub struct Update {
+  pub uid: Uuid,
+  pub staff_title: Option<String>,
+  pub education_title: Option<String>,
+  pub first_name: Option<String>,
+  pub last_name: Option<String>,
+  pub bio: Option<String>,
+  pub image: Option<String>,
+  pub department_id: Option<i16>,
+  pub roles: Option<Vec<String>>,
+}
+
+impl Handler<Update> for DbActor {
+  type Result = QueryResult<User>;
+
+  fn handle(&mut self, user: Update, _: &mut Self::Context) -> Self::Result {
+    let conn = self.0.get().expect("Unable to get a connection");
+    diesel::update(users.filter(id.eq(user.uid)))
+      .set((
+        staff_title.eq(user.staff_title),
+        education_title.eq(user.education_title),
+        first_name.eq(user.first_name),
+        last_name.eq(user.last_name),
+        bio.eq(user.bio),
+        image.eq(user.image),
+        department_id.eq(user.department_id),
+        roles.eq(user.roles.unwrap()),
+      ))
+      .get_result::<User>(&conn)
+  }
+}
+
+#[derive(Message)]
+#[rtype(result = "QueryResult<User>")]
+pub struct Delete {
+  pub uid: Uuid,
+}
+
+impl Handler<Delete> for DbActor {
+  type Result = QueryResult<User>;
+
+  fn handle(&mut self, user: Delete, _: &mut Self::Context) -> Self::Result {
+    let conn = self.0.get().expect("Unable to get a connection");
+    diesel::delete(users)
+      .filter(id.eq(user.uid))
+      .get_result::<User>(&conn)
   }
 }
