@@ -15,7 +15,7 @@ create table users (
   staff_title varchar null, 
   education_title varchar null, 
   email varchar not null unique, 
-  password varchar not null, 
+  password varchar null, 
   first_name varchar null, 
   last_name varchar null, 
   bio varchar null, 

@@ -1,7 +1,8 @@
 use crate::schema::users;
+use actix::Message;
 use actix_web::{Error, HttpRequest, HttpResponse, Responder};
 use chrono::NaiveDateTime;
-use diesel::{Insertable, Queryable};
+use diesel::{prelude::*, Insertable, Queryable};
 use futures::future::{ready, Ready};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -14,7 +15,7 @@ pub struct User {
   pub education_title: Option<String>,
   pub email: String,
   #[serde(skip_serializing)]
-  pub password: String,
+  pub password: Option<String>,
   pub first_name: Option<String>,
   pub last_name: Option<String>,
   pub bio: Option<String>,
@@ -43,8 +44,10 @@ impl Responder for User {
     ))
   }
 }
-#[derive(Deserialize)]
-pub struct SearchUser {
+
+#[derive(Message, Deserialize)]
+#[rtype(result = "QueryResult<Vec<User>>")]
+pub struct GetAll {
   pub page: Option<i32>,
   pub take: Option<i32>,
   pub username: Option<String>,
@@ -56,14 +59,15 @@ pub struct SearchUser {
   pub roles: Option<Vec<String>>,
 }
 
-#[derive(Deserialize, Debug, Insertable)]
+#[derive(Message, Deserialize, Debug, Insertable)]
+#[rtype(result = "QueryResult<User>")]
 #[table_name = "users"]
-pub struct NewUser {
+pub struct Create {
   pub username: String,
   pub staff_title: Option<String>,
   pub education_title: Option<String>,
   pub email: String,
-  pub password: String,
+  pub password: Option<String>,
   pub first_name: Option<String>,
   pub last_name: Option<String>,
   pub bio: String,
@@ -71,10 +75,16 @@ pub struct NewUser {
   pub department_id: Option<i16>,
   pub roles: Vec<String>,
 }
+#[derive(Message)]
+#[rtype(result = "QueryResult<User>")]
+pub struct GetById {
+  pub uid: Uuid,
+}
 
-#[derive(Serialize, Deserialize, Debug)]
-pub struct UpdateUser {
-  pub id: Uuid,
+#[derive(Message, Deserialize, Debug)]
+#[rtype(result = "QueryResult<User>")]
+pub struct Update {
+  pub uid: Uuid,
   pub staff_title: Option<String>,
   pub education_title: Option<String>,
   pub first_name: Option<String>,
@@ -83,4 +93,10 @@ pub struct UpdateUser {
   pub image: Option<String>,
   pub department_id: Option<i16>,
   pub roles: Option<Vec<String>>,
+}
+
+#[derive(Message)]
+#[rtype(result = "QueryResult<User>")]
+pub struct Delete {
+  pub uid: Uuid,
 }

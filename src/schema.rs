@@ -14,7 +14,7 @@ table! {
         staff_title -> Nullable<Varchar>,
         education_title -> Nullable<Varchar>,
         email -> Varchar,
-        password -> Varchar,
+        password -> Nullable<Varchar>,
         first_name -> Nullable<Varchar>,
         last_name -> Nullable<Varchar>,
         bio -> Nullable<Varchar>,

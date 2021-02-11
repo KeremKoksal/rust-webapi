@@ -1,76 +1,35 @@
 use super::DbActor;
 use crate::diesel::prelude::*;
-use crate::models::user::{NewUser, User};
+use crate::models::user::{Create, Delete, GetAll, GetById, Update, User};
 use crate::schema::users::dsl::*;
-use actix::{Handler, Message};
+use actix::Handler;
 use argon2::{
   password_hash::{PasswordHash, PasswordHasher, PasswordVerifier, SaltString},
   Argon2,
 };
 use rand_core::OsRng;
-use uuid::Uuid;
-
-#[derive(Message)]
-#[rtype(result = "QueryResult<User>")]
-pub struct Create {
-  pub username: String,
-  pub staff_title: Option<String>,
-  pub education_title: Option<String>,
-  pub email: String,
-  pub password: String,
-  pub first_name: Option<String>,
-  pub last_name: Option<String>,
-  pub bio: String,
-  pub image: String,
-  pub department_id: Option<i16>,
-  pub roles: Vec<String>,
-}
 
 impl Handler<Create> for DbActor {
   type Result = QueryResult<User>;
 
-  fn handle(&mut self, msg: Create, _: &mut Self::Context) -> Self::Result {
+  fn handle(&mut self, mut new_user: Create, _: &mut Self::Context) -> Self::Result {
     let conn = self.0.get().expect("Unable to get a connection");
-    let salt = SaltString::generate(&mut OsRng);
-    let argon2 = Argon2::default();
-    let pw: &[u8] = msg.password.as_bytes();
-    let password_hash = argon2
-      .hash_password_simple(pw, salt.as_ref())
-      .unwrap()
-      .to_string();
 
-    let new_user = NewUser {
-      username: msg.username,
-      staff_title: msg.staff_title,
-      education_title: msg.education_title,
-      email: msg.email,
-      password: password_hash,
-      first_name: msg.first_name,
-      last_name: msg.last_name,
-      bio: msg.bio,
-      image: msg.image,
-      department_id: msg.department_id,
-      roles: msg.roles,
-    };
+    if let Some(pword) = new_user.password {
+      let salt = SaltString::generate(&mut OsRng);
+      let argon2 = Argon2::default();
+      let pw: &[u8] = pword.as_bytes();
+      let password_hash = argon2
+        .hash_password_simple(pw, salt.as_ref())
+        .unwrap()
+        .to_string();
+      new_user.password = Some(password_hash.to_string());
+    }
 
     diesel::insert_into(users)
       .values(new_user)
       .get_result::<User>(&conn)
   }
-}
-
-#[derive(Message)]
-#[rtype(result = "QueryResult<Vec<User>>")]
-pub struct GetAll {
-  pub page: Option<i32>,
-  pub take: Option<i32>,
-  pub username: Option<String>,
-  pub first_name: Option<String>,
-  pub last_name: Option<String>,
-  pub email: Option<String>,
-  pub department_id: Option<i16>,
-  pub active: Option<bool>,
-  pub roles: Option<Vec<String>>,
 }
 
 impl Handler<GetAll> for DbActor {
@@ -116,12 +75,6 @@ impl Handler<GetAll> for DbActor {
   }
 }
 
-#[derive(Message)]
-#[rtype(result = "QueryResult<User>")]
-pub struct GetById {
-  pub uid: Uuid,
-}
-
 impl Handler<GetById> for DbActor {
   type Result = QueryResult<User>;
 
@@ -129,20 +82,6 @@ impl Handler<GetById> for DbActor {
     let conn = self.0.get().expect("Unable to get a connection");
     users.filter(id.eq(user.uid)).get_result::<User>(&conn)
   }
-}
-
-#[derive(Message)]
-#[rtype(result = "QueryResult<User>")]
-pub struct Update {
-  pub uid: Uuid,
-  pub staff_title: Option<String>,
-  pub education_title: Option<String>,
-  pub first_name: Option<String>,
-  pub last_name: Option<String>,
-  pub bio: Option<String>,
-  pub image: Option<String>,
-  pub department_id: Option<i16>,
-  pub roles: Option<Vec<String>>,
 }
 
 impl Handler<Update> for DbActor {
@@ -163,12 +102,6 @@ impl Handler<Update> for DbActor {
       ))
       .get_result::<User>(&conn)
   }
-}
-
-#[derive(Message)]
-#[rtype(result = "QueryResult<User>")]
-pub struct Delete {
-  pub uid: Uuid,
 }
 
 impl Handler<Delete> for DbActor {
