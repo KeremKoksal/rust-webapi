@@ -84,7 +84,7 @@ pub struct GetById {
 #[derive(Message, Deserialize, Debug)]
 #[rtype(result = "QueryResult<User>")]
 pub struct Update {
-  pub uid: Uuid,
+  pub id: Uuid,
   pub staff_title: Option<String>,
   pub education_title: Option<String>,
   pub first_name: Option<String>,

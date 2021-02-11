@@ -13,13 +13,12 @@ Content-Type: application/json
   "first_name": "",
   "last_name": "",
   "email": "",
-  "department_id": 0,
   "active": true,
   "roles": []
 
 }
 ###
-GET http://localhost:8080/api/v1/users/750a7d29-9725-4064-bb12-357fe81c627d HTTP/1.1
+GET http://localhost:8080/api/v1/users/fc1b278b-1a73-446f-b354-8caa36b3c13d HTTP/1.1
 User-Agent: rest-client
 
 
@@ -30,16 +29,17 @@ User-Agent: rest-client
 Content-Type: application/json
 
 {
-      "username": "user 1",
+      "username": "user 3",
       "staff_title": "staff",
       "education_title": "Phd",
-      "email": "user1@example.com",
+      "email": "user3@example.com",
       "password": "password",
-      "first_name": "user 1",
-      "last_name": "loser",
-      "bio": "some bio",
-      "image": "https://avatars.githubusercontent.com/u/6117104?s=60&v=4",
-      "roles": ["slave"]
+      "first_name": "user 3",
+      "last_name": "loser 3",
+      "bio": "some bio 3",
+      "image": "",
+      "department_id":null,
+      "roles": []
 }
 
 ###
@@ -49,12 +49,22 @@ User-Agent: rest-client
 Content-Type: application/json
 
 {
-  "id":1,
-  "username":"updated name"
-}
+    "id": "fc1b278b-1a73-446f-b354-8caa36b3c13d",
+    "staff_title": "staff",
+    "education_title": "Phd",
+    "first_name": "user 1",
+    "last_name": "loser",
+    "bio": "some bio",
+    "image": "",
+    "department_id": null,
+    "roles": [
+      "admin"
+    ]
+  }
+  
 ###
 
-DELETE  http://localhost:8080/api/v1/users/1 HTTP/1.1
+DELETE  http://localhost:8080/api/v1/users/750a7d29-9725-4064-bb12-357fe81c627d HTTP/1.1
 User-Agent: rest-client
 
 ###

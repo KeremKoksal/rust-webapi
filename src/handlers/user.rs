@@ -1,12 +1,12 @@
 use super::DbActor;
-use crate::diesel::prelude::*;
 use crate::models::user::{Create, Delete, GetAll, GetById, Update, User};
 use crate::schema::users::dsl::*;
 use actix::Handler;
 use argon2::{
-  password_hash::{PasswordHash, PasswordHasher, PasswordVerifier, SaltString},
+  password_hash::{PasswordHasher, SaltString},
   Argon2,
 };
+use diesel::prelude::*;
 use rand_core::OsRng;
 
 impl Handler<Create> for DbActor {
@@ -39,36 +39,36 @@ impl Handler<GetAll> for DbActor {
     let conn = self.0.get().expect("Unable to get a connection");
     let mut offset = 0;
     let mut limit = 10;
-    if search_filters.take.is_some() {
-      limit = search_filters.take.unwrap();
+    if let Some(_limit) = search_filters.take {
+      limit = _limit;
     }
 
-    if search_filters.page.is_some() {
-      offset = search_filters.page.unwrap() * limit;
+    if let Some(page) = search_filters.page {
+      offset = page * limit;
     };
 
     let mut data = users.offset(offset.into()).limit(limit.into()).into_boxed();
 
-    if search_filters.username.is_some() {
-      data = data.filter(username.ilike(format!("%{}%", search_filters.username.unwrap())));
+    if let Some(_username) = search_filters.username {
+      data = data.filter(username.ilike(format!("%{}%", _username)));
     }
-    if search_filters.first_name.is_some() {
-      data = data.filter(first_name.ilike(format!("%{}%", search_filters.first_name.unwrap())));
+    if let Some(_first_name) = search_filters.first_name {
+      data = data.filter(first_name.ilike(format!("%{}%", _first_name)));
     }
-    if search_filters.last_name.is_some() {
-      data = data.filter(last_name.ilike(format!("%{}%", search_filters.last_name.unwrap())));
+    if let Some(_last_name) = search_filters.last_name {
+      data = data.filter(last_name.ilike(format!("%{}%", _last_name)));
     }
-    if search_filters.email.is_some() {
-      data = data.filter(email.ilike(format!("%{}%", search_filters.email.unwrap())));
+    if let Some(_email) = search_filters.email {
+      data = data.filter(email.ilike(format!("%{}%", _email)));
     }
-    if search_filters.department_id.is_some() {
-      data = data.filter(department_id.eq(search_filters.department_id.unwrap()));
+    if let Some(_department_id) = search_filters.department_id {
+      data = data.filter(department_id.eq(_department_id));
     }
-    if search_filters.active.is_some() {
-      data = data.filter(active.eq(search_filters.active.unwrap()));
+    if let Some(_active) = search_filters.active {
+      data = data.filter(active.eq(_active));
     }
-    if search_filters.roles.is_some() {
-      data = data.filter(roles.contains(search_filters.roles.unwrap()));
+    if let Some(_roles) = search_filters.roles {
+      data = data.filter(roles.contains(_roles));
     }
 
     data.get_results::<User>(&conn)
@@ -89,7 +89,7 @@ impl Handler<Update> for DbActor {
 
   fn handle(&mut self, user: Update, _: &mut Self::Context) -> Self::Result {
     let conn = self.0.get().expect("Unable to get a connection");
-    diesel::update(users.filter(id.eq(user.uid)))
+    diesel::update(users.filter(id.eq(user.id)))
       .set((
         staff_title.eq(user.staff_title),
         education_title.eq(user.education_title),

@@ -33,7 +33,7 @@ pub async fn new_user(state: web::Data<AppState>, user: web::Json<Create>) -> im
   let user = user.into_inner();
 
   match db.send(user).await {
-    Ok(Ok(user)) => HttpResponse::Ok().json(user),
+    Ok(Ok(user)) => HttpResponse::Created().json(user),
     _ => HttpResponse::InternalServerError().json("Something went wrong"),
   }
 }
@@ -47,17 +47,7 @@ pub async fn update_user(
   let user = user.into_inner();
 
   match db
-    .send(Update {
-      uid: user.uid,
-      staff_title: user.staff_title,
-      education_title: user.education_title,
-      first_name: user.first_name,
-      last_name: user.last_name,
-      bio: user.bio,
-      image: user.image,
-      department_id: user.department_id,
-      roles: user.roles,
-    })
+    .send(user)
     .await
   {
     Ok(Ok(user)) => HttpResponse::Ok().json(user),

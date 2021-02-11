@@ -26,7 +26,7 @@ async fn main() -> std::io::Result<()> {
     dotenv::dotenv().ok();
 
     let bd_url = std::env::var("DATABASE_URL").expect("DATABASE_URL");
-
+    let jwt_secret = std::env::var("JWT_SECRET").expect("JWT_SECRET");
     let db_manager = ConnectionManager::<PgConnection>::new(bd_url);
 
     let db_pool = Pool::builder()
@@ -38,7 +38,8 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .data(AppState {
-                db: db_addr.clone()
+                db: db_addr.clone(),
+                jwt: jwt_secret.to_string().clone()
             })
             .service(web::scope("/api/v1").configure(routes::config))
             .service(
