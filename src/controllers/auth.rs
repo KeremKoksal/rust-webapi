@@ -9,7 +9,7 @@ use argon2::{
 };
 use chrono::Duration;
 use chrono::Utc;
-use jsonwebtoken::{encode, EncodingKey, Header};
+use jsonwebtoken::{encode, EncodingKey, Header,Algorithm};
 
 #[post("/login")]
 pub async fn login(state: web::Data<AppState>, data: web::Json<Login>) -> impl Responder {
@@ -29,9 +29,10 @@ pub async fn login(state: web::Data<AppState>, data: web::Json<Login>) -> impl R
         .verify_password(login_attempt.password.unwrap().as_bytes(), &parsed_hash)
         .is_ok()
       {
-        let headers = Header::default();
+        let mut headers = Header::default();
+        headers.alg = Algorithm::HS512;
         let encoding_key = EncodingKey::from_secret(jwt.as_bytes());
-        let now = Utc::now() + Duration::days(1); // Expires in 1 day
+        let now = Utc::now();// + Duration::days(1); // Expires in 1 day
         let claims = Claims {
           sub: user.id,
           exp: now.timestamp(),

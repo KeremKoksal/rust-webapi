@@ -4,6 +4,7 @@ GET http://localhost:8080
 ###
 GET http://localhost:8080/api/v1/users/ HTTP/1.1
 User-Agent: rest-client
+Authorization: Bearer yJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmYzFiMjc4Yi0xYTczLTQ0NmYtYjM1NC04Y2FhMzZiM2MxM2QiLCJleHAiOjE2MTM1NTIwMTMsInJvbGVzIjpbInNsYXZlIl19.MSp-6tLBU5cBlBOZFCKMpsLabKIMmZIxppOsjtIUNCo6UiDf2q7qVZgFY8W5vLlHzZ7fr99QGsDUUnCF54C_CA
 Content-Type: application/json
 
 {

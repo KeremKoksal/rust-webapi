@@ -7,6 +7,7 @@ mod models;
 mod routes;
 mod controllers;
 mod schema;
+mod middleware;
 
 use handlers::DbActor;
 use models::AppState;
