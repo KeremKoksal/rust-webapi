@@ -21,3 +21,4 @@ diesel={version="1.4.5", features=["uuidv07", "r2d2", "postgres","chrono"] }
 chrono={version="0.4.19", features=["serde"]}
 dotenv="0.15.0"
 jsonwebtoken="7.2.0"
+futures-util="0.3.13"

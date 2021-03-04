@@ -3,7 +3,7 @@ User-Agent: rest-client
 Content-Type: application/json
 
 {
-  "username":"user 1",
+  "username":"user",
   "password":"password"
 }
 

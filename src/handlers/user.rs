@@ -1,14 +1,14 @@
 use super::DbActor;
-use crate::models::user::{Create, Delete, GetAll, GetById, Update, User};
+use crate::models::user::{Count, Create, Delete, GetAll, GetById, Update, User};
 use crate::schema::users::dsl::*;
 use actix::Handler;
 use argon2::{
   password_hash::{PasswordHasher, SaltString},
   Argon2,
 };
+use diesel::dsl::count;
 use diesel::prelude::*;
 use rand_core::OsRng;
-
 impl Handler<Create> for DbActor {
   type Result = QueryResult<User>;
 
@@ -44,7 +44,9 @@ impl Handler<GetAll> for DbActor {
     }
 
     if let Some(page) = search_filters.page {
-      offset = page * limit;
+      if page > 0 {
+        offset = (page - 1) * limit;
+      }
     };
 
     let mut data = users.offset(offset.into()).limit(limit.into()).into_boxed();
@@ -72,6 +74,39 @@ impl Handler<GetAll> for DbActor {
     }
 
     data.get_results::<User>(&conn)
+  }
+}
+impl Handler<Count> for DbActor {
+  type Result = QueryResult<i64>;
+
+  fn handle(&mut self, search_filters: Count, _: &mut Self::Context) -> Self::Result {
+    let conn = self.0.get().expect("Unable to get a connection");
+
+    let mut data = users.into_boxed();
+
+    if let Some(_username) = search_filters.username {
+      data = data.filter(username.ilike(format!("%{}%", _username)));
+    }
+    if let Some(_first_name) = search_filters.first_name {
+      data = data.filter(first_name.ilike(format!("%{}%", _first_name)));
+    }
+    if let Some(_last_name) = search_filters.last_name {
+      data = data.filter(last_name.ilike(format!("%{}%", _last_name)));
+    }
+    if let Some(_email) = search_filters.email {
+      data = data.filter(email.ilike(format!("%{}%", _email)));
+    }
+    if let Some(_department_id) = search_filters.department_id {
+      data = data.filter(department_id.eq(_department_id));
+    }
+    if let Some(_active) = search_filters.active {
+      data = data.filter(active.eq(_active));
+    }
+    if let Some(_roles) = search_filters.roles {
+      data = data.filter(roles.contains(_roles));
+    }
+
+    data.select(count(id)).first(&conn)
   }
 }
 

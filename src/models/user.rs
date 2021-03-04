@@ -1,3 +1,4 @@
+use crate::models::pagination::Pagination;
 use crate::schema::users;
 use actix::Message;
 use actix_web::{Error, HttpRequest, HttpResponse, Responder};
@@ -45,7 +46,14 @@ impl Responder for User {
   }
 }
 
-#[derive(Message, Deserialize)]
+#[derive(Serialize)]
+pub struct PaginatedUsers {
+  pub users: Vec<User>,
+  pub pagination: Pagination
+}
+
+
+#[derive(Message, Deserialize, Clone)]
 #[rtype(result = "QueryResult<Vec<User>>")]
 pub struct GetAll {
   pub page: Option<i32>,
@@ -58,6 +66,18 @@ pub struct GetAll {
   pub active: Option<bool>,
   pub roles: Option<Vec<String>>,
 }
+#[derive(Message, Deserialize)]
+#[rtype(result = "QueryResult<i64>")]
+pub struct Count {
+  pub username: Option<String>,
+  pub first_name: Option<String>,
+  pub last_name: Option<String>,
+  pub email: Option<String>,
+  pub department_id: Option<i16>,
+  pub active: Option<bool>,
+  pub roles: Option<Vec<String>>,
+}
+
 
 #[derive(Message, Deserialize, Debug, Insertable)]
 #[rtype(result = "QueryResult<User>")]

@@ -32,9 +32,9 @@ pub async fn login(state: web::Data<AppState>, data: web::Json<Login>) -> impl R
         let mut headers = Header::default();
         headers.alg = Algorithm::HS512;
         let encoding_key = EncodingKey::from_secret(jwt.as_bytes());
-        let now = Utc::now();// + Duration::days(1); // Expires in 1 day
+        let now = Utc::now() + Duration::days(1); // Expires in 1 day
         let claims = Claims {
-          sub: user.id,
+          user_id: user.id,
           exp: now.timestamp(),
           roles: user.roles,
         };

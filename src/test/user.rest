@@ -1,15 +1,25 @@
 GET http://localhost:8080
 # Host: www.rust-lang.org
 
+
 ###
+
+GET http://localhost:8080/api/v1/users/profile/ HTTP/1.1
+User-Agent: rest-client
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJ1c2VyX2lkIjoiYzMzNzIyNjUtYWQzYy00OTkxLTkwYTQtM2Y2OGU3MWNiNWZhIiwiZXhwIjoxNjE0OTI4NDM1LCJyb2xlcyI6W119.UMb4TYfxP21J4VUXobB223QNAHIFunhOL4As1VVIWlLA0r4L4XW_9mf5pRSDyDgwNoOH95lkCnnWhG8U4_ndig
+
+
+
+
+### 
 GET http://localhost:8080/api/v1/users/ HTTP/1.1
 User-Agent: rest-client
-Authorization: Bearer yJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmYzFiMjc4Yi0xYTczLTQ0NmYtYjM1NC04Y2FhMzZiM2MxM2QiLCJleHAiOjE2MTM1NTIwMTMsInJvbGVzIjpbInNsYXZlIl19.MSp-6tLBU5cBlBOZFCKMpsLabKIMmZIxppOsjtIUNCo6UiDf2q7qVZgFY8W5vLlHzZ7fr99QGsDUUnCF54C_CA
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJ1c2VyX2lkIjoiYzMzNzIyNjUtYWQzYy00OTkxLTkwYTQtM2Y2OGU3MWNiNWZhIiwiZXhwIjoxNjE0OTI4NDM1LCJyb2xlcyI6W119.UMb4TYfxP21J4VUXobB223QNAHIFunhOL4As1VVIWlLA0r4L4XW_9mf5pRSDyDgwNoOH95lkCnnWhG8U4_ndig
 Content-Type: application/json
 
 {
-  "page":0,
-  "take":10,
+  "page":1,
+  "take":5,
   "username": "",
   "first_name": "",
   "last_name": "",
@@ -19,14 +29,16 @@ Content-Type: application/json
 
 }
 ###
-GET http://localhost:8080/api/v1/users/fc1b278b-1a73-446f-b354-8caa36b3c13d HTTP/1.1
+GET http://localhost:8080/api/v1/users/c3372265-ad3c-4991-90a4-3f68e71cb5fa HTTP/1.1
 User-Agent: rest-client
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJ1c2VyX2lkIjoiYzMzNzIyNjUtYWQzYy00OTkxLTkwYTQtM2Y2OGU3MWNiNWZhIiwiZXhwIjoxNjE0OTI4NDM1LCJyb2xlcyI6W119.UMb4TYfxP21J4VUXobB223QNAHIFunhOL4As1VVIWlLA0r4L4XW_9mf5pRSDyDgwNoOH95lkCnnWhG8U4_ndig
 
 
 ###
 
 POST http://localhost:8080/api/v1/users/ HTTP/1.1
 User-Agent: rest-client
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJ1c2VyX2lkIjoiYzMzNzIyNjUtYWQzYy00OTkxLTkwYTQtM2Y2OGU3MWNiNWZhIiwiZXhwIjoxNjE0OTI4NDM1LCJyb2xlcyI6W119.UMb4TYfxP21J4VUXobB223QNAHIFunhOL4As1VVIWlLA0r4L4XW_9mf5pRSDyDgwNoOH95lkCnnWhG8U4_ndig
 Content-Type: application/json
 
 {
@@ -35,8 +47,8 @@ Content-Type: application/json
       "education_title": "Phd",
       "email": "user3@example.com",
       "password": "password",
-      "first_name": "user 3",
-      "last_name": "loser 3",
+      "first_name": "fn 3",
+      "last_name": "ln 3",
       "bio": "some bio 3",
       "image": "",
       "department_id":null,

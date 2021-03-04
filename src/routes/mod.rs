@@ -15,3 +15,4 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     )
     .service(auth::auth_routes());
 }
+ 
