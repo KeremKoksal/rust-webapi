@@ -5,6 +5,7 @@ use actix_web::{
   error::{ErrorInternalServerError, ErrorUnauthorized},
   Error, FromRequest, HttpRequest,
 };
+
 use actix_web_httpauth::extractors::bearer::BearerAuth;
 use diesel::prelude::*;
 use futures_util::future::{err, ok, Ready};
@@ -12,6 +13,7 @@ use jsonwebtoken::{
   errors::ErrorKind,
   {decode, Algorithm, DecodingKey, Validation},
 };
+
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
